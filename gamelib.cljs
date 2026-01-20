@@ -34,7 +34,7 @@
 
 ;; functions to operate on structs
 (defn next-gen? [nb cells]
-  (reduce + (for [[x y] nb]
+  (reduce + (for [[x y] nb] ;; Haskell-like destructuring
     (if (alive? (get-in cells [y x]))) ;; -> cells[y][x].is_alive();
       1 ;; T
       0))) ;; F
