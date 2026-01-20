@@ -25,6 +25,7 @@
   (cell 'get-xy))
 (defn display [cell]
   (cell 'display))
+
 (defn xy=? [cell this-x this-y]
   (let [x (0 (get-xy cell)) y (1 (get-xy cell))]
     (cond 
@@ -32,9 +33,11 @@
       :else false)))
 
 ;; functions to operate on structs
-(defn next-gen? [nbs cells]
-  (for [cell cells]
-    ()))
+(defn next-gen? [nb cells]
+  (reduce + (for [[x y] nb]
+    (if (alive? (get-in cells [y x]))) ;; -> cells[y][x].is_alive();
+      1 ;; T
+      0))) ;; F
 
 (def cs (for [x (range 3) y (range 3)] (init-cell x y false)))
 (def dcs (map display cs))
