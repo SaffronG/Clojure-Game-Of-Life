@@ -9,7 +9,6 @@
       (vec (for [x-off [-1 0 1]
             y-off [-1 0 1]]
         [(+ x x-off) (+ y y-off)]))
-      (= predicate 'evolve) ()
       (= predicate 'get-xy) [x y]
       (= predicate 'display) (str x " " y " " state)
       :else nil)))
@@ -23,7 +22,6 @@
 ;; accessors
 (defn alive? [cell] (cell 'alive?))
 (defn get-neighbors [cell] (cell 'get-neighbors))
-(defn evolve [cell] (cell 'evolve))
 (defn get-xy [cell] (cell 'get-xy))
 (defn display [cell] (cell 'display))
 
@@ -46,19 +44,21 @@
           is-alive (alive? cell)]
       ;; define rules
       (if is-alive
+        ;; alive
         (cond
-          (< nb-count 2) true;; underpopulation
+          (< nb-count 2) false ;; underpopulation
           (and (>= nb-count 3) (<= nb-count 4)) true ;; nothing
           :else false ;; overpopulation
         ) 
+        ;; dead
         (cond
           (= nb-count 3) true ;; reproduction
           :else false))))
 
-;; TODO 
-(defn next-generation [w h cells]
-  :TODO)
+(defn next-generation [dimensions cells]
+  (for [row cells]
+    (map survives? dimensions cells cell)))
 
 ;; TODO
-(defn run-n [w h cells n]
+(defn run-n [dimensions cells n]
   :TODO)
