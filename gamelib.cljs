@@ -20,26 +20,27 @@
 (defn display [cell] (cell 'display))
 
 ;; initialize the simple nested vec struct for the game board
+;; Might need to force an eval because it is Lazy Evaluated
 (defn init-list [dim]
   (vec (for [row (range dim)]
     (vec (for [col (range dim)]
       (init-cell col row false)))))) ;; -> [board]
 
 ;; neighbor alive counter (original idea, slightly cleaned)
-;; Not null-checking -> Throws error
-;; TODO add null-check
+(declare in-bounds?)
 (defn count-alive [nb cells]
   (reduce +
     (for [[x y] nb]
-      (if (alive? (get-in cells [y x]))
-        1
+      (if (in-bounds? y x)
+        (if (alive? (get-in cells [y x]))
+          1
+          0)
         0))))
 
 ;; small helper added (NOT finishing logic)
-;; TODO -> apply to count-alive function
-(defn in-bounds? [w h [x y]]
-  (and (<= 0 x) (< x w)
-       (<= 0 y) (< y h)))
+(defn in-bounds? [r c [x y]]
+  (and (<= 0 x) (< x r)
+       (<= 0 y) (< y c)))
 
 ;; added function to be placed within map to check if each cell will survive to the next generation
 (defn survives? [dimensions cells cell] 
@@ -58,9 +59,11 @@
           (= nb-count 3) true ;; reproduction
           :else false))))
 
-(defn next-generation [dimensions cells]
-  (for [cell cells]
-    (map survives? dimensions cells cell)))
+;; Johan
+;;(defn next-generation [dimensions cells]
+;;  (for [cell cells]
+;;    (map survives? dimensions cells cell)))
+;; Johan
 
 ;; TODO
 (defn run-n [dimensions cells n]
