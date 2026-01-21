@@ -1,23 +1,17 @@
 (ns gamelib)
 
 ;; cell as closure
-(defn init-cell [x y state]
+(defn init-cell [x y state] ;; similar to cons
   (fn [predicate]
     (cond
-      (= predicate 'alive?) state
+      (= predicate 'alive?) state ;; -> T / F
       (= predicate 'get-neighbors)
       (vec (for [x-off [-1 0 1]
             y-off [-1 0 1]]
         [(+ x x-off) (+ y y-off)]))
-      (= predicate 'get-xy) [x y]
-      (= predicate 'display) (str x " " y " " state)
+        (= predicate 'get-xy) [x y] ;; -> [all neghbors]
+      (= predicate 'display) (str x " " y " " state) ;; -> to-string function
       :else nil)))
-
-;; initialize the simple nested vec struct for the game board
-(defn init-list [dim]
-  (vec (for [row (range dim)]
-    (vec (for [col (range dim)]
-      (init-cell col row false))))))
 
 ;; accessors
 (defn alive? [cell] (cell 'alive?))
@@ -25,7 +19,15 @@
 (defn get-xy [cell] (cell 'get-xy))
 (defn display [cell] (cell 'display))
 
+;; initialize the simple nested vec struct for the game board
+(defn init-list [dim]
+  (vec (for [row (range dim)]
+    (vec (for [col (range dim)]
+      (init-cell col row false)))))) ;; -> [board]
+
 ;; neighbor alive counter (original idea, slightly cleaned)
+;; Not null-checking -> Throws error
+;; TODO add null-check
 (defn count-alive [nb cells]
   (reduce +
     (for [[x y] nb]
@@ -34,6 +36,7 @@
         0))))
 
 ;; small helper added (NOT finishing logic)
+;; TODO -> apply to count-alive function
 (defn in-bounds? [w h [x y]]
   (and (<= 0 x) (< x w)
        (<= 0 y) (< y h)))
@@ -56,9 +59,9 @@
           :else false))))
 
 (defn next-generation [dimensions cells]
-  (for [row cells]
+  (for [cell cells]
     (map survives? dimensions cells cell)))
 
 ;; TODO
 (defn run-n [dimensions cells n]
-  :TODO)
+  :TODO) ;; Run til the nth generation
