@@ -1,36 +1,34 @@
 (ns gamelib)
 
-;; cell as closure (original)
+;; cell as closure
 (defn init-cell [x y state]
   (fn [predicate]
     (cond
       (= predicate 'alive?) state
-      (= predicate 'check-neighbor)
-      (for [x-off [-1 0 1]
+      (= predicate 'get-neighbors)
+      (vec (for [x-off [-1 0 1]
             y-off [-1 0 1]]
-        [(+ x x-off) (+ y y-off)])
+        [(+ x x-off) (+ y y-off)]))
       (= predicate 'evolve) ()
       (= predicate 'get-xy) [x y]
       (= predicate 'display) (str x " " y " " state)
       :else nil)))
 
-;; accessors (original)
+;; initialize the simple nested vec struct for the game board
+(defn init-list [dim]
+  (vec (for [row (range dim)]
+    (vec (for [col (range dim)]
+      (init-cell col row false))))))
+
+;; accessors
 (defn alive? [cell] (cell 'alive?))
-(defn check-neighbor [cell] (cell 'check-neighbor))
+(defn get-neighbors [cell] (cell 'get-neighbors))
 (defn evolve [cell] (cell 'evolve))
 (defn get-xy [cell] (cell 'get-xy))
 (defn display [cell] (cell 'display))
 
-;; unused helper (original, kept)
-(defn xy=? [cell this-x this-y]
-  (let [x (0 (get-xy cell))
-        y (1 (get-xy cell))]
-    (cond
-      (= (= x this-x) (= y this-y)) true
-      :else false)))
-
 ;; neighbor alive counter (original idea, slightly cleaned)
-(defn next-gen? [nb cells]
+(defn count-alive [nb cells]
   (reduce +
     (for [[x y] nb]
       (if (alive? (get-in cells [y x]))
@@ -42,9 +40,20 @@
   (and (<= 0 x) (< x w)
        (<= 0 y) (< y h)))
 
-;; TODO
-(defn survives? [w h cells cell]
-  :TODO)
+;; added function to be placed within map to check if each cell will survive to the next generation
+(defn survives? [dimensions cells cell] 
+    (let [nb-count (count-alive (get-neighbors cell) cells)
+          is-alive (alive? cell)]
+      ;; define rules
+      (if is-alive
+        (cond
+          (< nb-count 2) true;; underpopulation
+          (and (>= nb-count 3) (<= nb-count 4)) true ;; nothing
+          :else false ;; overpopulation
+        ) 
+        (cond
+          (= nb-count 3) true ;; reproduction
+          :else false))))
 
 ;; TODO 
 (defn next-generation [w h cells]
