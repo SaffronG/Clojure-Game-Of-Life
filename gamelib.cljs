@@ -10,7 +10,7 @@
             y-off [-1 0 1]]
         [(+ x x-off) (+ y y-off)]))
         (= predicate 'get-xy) [x y] ;; -> [all neghbors]
-      (= predicate 'display) (str x " " y " " state) ;; -> to-string function
+      (= predicate 'display) (str (if (= true state) "#" "-")) ;; -> to-string function
       :else nil)))
 
 ;; accessors
@@ -31,16 +31,16 @@
 (defn count-alive [nb cells]
   (reduce +
     (for [[x y] nb]
-      (if (in-bounds? y x)
+      (if (in-bounds? y x [x y])
         (if (alive? (get-in cells [y x]))
           1
           0)
         0))))
 
 ;; small helper added (NOT finishing logic)
-(defn in-bounds? [r c [x y]]
-  (and (<= 0 x) (< x r)
-       (<= 0 y) (< y c)))
+(defn in-bounds? [dimensions [x y]]
+  (and (<= 0 x) (< x dimensions)
+       (<= 0 y) (< y dimensions)))
 
 ;; added function to be placed within map to check if each cell will survive to the next generation
 (defn survives? [dimensions cells cell] 
@@ -59,12 +59,10 @@
           (= nb-count 3) true ;; reproduction
           :else false))))
 
-;; Johan
-;;(defn next-generation [dimensions cells]
-;;  (for [cell cells]
-;;    (map survives? dimensions cells cell)))
-;; Johan
-
 ;; TODO
+(defn next-generation [dimensions cells]
+  (for [cell cells]
+    (mapv survives? dimensions cells cell)))
+
 (defn run-n [dimensions cells n]
-  :TODO) ;; Run til the nth generation
+  (take n (iterate next-generation cells))) ;; Run til the nth generation
