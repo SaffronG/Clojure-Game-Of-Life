@@ -14,9 +14,10 @@
       (print (gamelib/display cell))) ;; Print the cell string and a separator
     (println)))                ;; Move to a new line after each row
 
-(def initial-state '([1 2] [1 0] [2 2] [0 0])) ;; Change this to change the initial state
+;; Change this to change the initial state
+(def initial-state '([1 0] [2 1] [0 2] [1 2] [2 2]))
 
-(def dimensions 3) ;; Change this to change the size of the square
+(def dimensions 6) ;; Change this to change the size of the square
 (def cs 
   (vec 
     (for [y (range dimensions)]
@@ -26,4 +27,8 @@
             (gamelib/init-cell x y initialize?)))))))
 
 (display-board cs)
+(def nth-gen (gamelib/run-n dimensions cs 6)) ;; run-n (size) (vectored list) (generations)
+(doseq [gen nth-gen]
+  (println "--- Generation ---")
+  (display-board gen))
 (println "\n**END OF EXECUTION**")
