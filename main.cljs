@@ -9,10 +9,11 @@
 
 ;; This function was created with help from Gemini to aid with testing accuracy
 (defn display-board [cells]
-  (doseq [row cells]           ;; Iterate through each row vector
-    (doseq [cell row]          ;; Iterate through each cell closure in the row
-      (print (gamelib/display cell))) ;; Print the cell string and a separator
-    (println)))                ;; Move to a new line after each row
+  (doseq [row cells]
+    ;; 1. Map the display function over the row
+    ;; 2. Join them with a space
+    ;; 3. Print the resulting single string for the whole row
+    (println (clojure.string/join " " (map gamelib/display row)))))
 
 ;; Change this to change the initial state
 (def initial-state '([1 0] [2 1] [0 2] [1 2] [2 2]))
@@ -26,9 +27,8 @@
           (let [initialize? (boolean (some #{[y x]} initial-state))]
             (gamelib/init-cell x y initialize?)))))))
 
-(display-board cs)
 (def nth-gen (gamelib/run-n dimensions cs 6)) ;; run-n (size) (vectored list) (generations)
 (doseq [gen nth-gen]
-  (println "--- Generation ---")
+  (println "\n--- Generation ---")
   (display-board gen))
 (println "\n**END OF EXECUTION**")
