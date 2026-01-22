@@ -60,11 +60,15 @@
           :else false))))
 
 (defn next-generation [dimensions cells]
-  (vec (for [row cells]
-    (vec (for [cell row]
-      (let [[x y] (get-xy cell)
-            new-state (survives? dimensions cells cell)]
-        (init-cell x y new-state)))))))
+  (mapv
+    (fn [row]
+      (mapv
+        (fn [cell]
+          (let [[x y] (get-xy cell)
+                new-state (survives? dimensions cells cell)]
+            (init-cell x y new-state)))
+        row))
+    cells))
 
 (defn run-n [dimensions cells n]
   (take n (iterate #(next-generation dimensions %) cells))) ;; Run til the nth generation
